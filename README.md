@@ -1,6 +1,6 @@
-# Variable Discretization for Self-Supervised Learning
+# Information-Maximized Soft Variable Discretization for Self-Supervised Image Representation Learning
 
-This is a Pytorch implementation of the [paper](https://openreview.net/pdf?id=p7DIDSzT8x).
+This is a Pytorch implementation of paper.
 
 
 ## Installation
@@ -14,7 +14,7 @@ conda install matplotlib
 ## Pretrain on ImageNet
 
 ```shell script
-sbatch job_vd.sh  # need to adjust according to your computing platform
+sbatch job_imsvd.sh  # need to adjust according to your computing platform
 ```
 
 ## Linear Evaluation on ImageNet

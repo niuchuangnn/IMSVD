@@ -16,7 +16,7 @@ os.environ["CUDA_VISIBLE_DEVICES"] = '0'
 
 
 def get_arguments():
-    parser = argparse.ArgumentParser(description="Pretrain a resnet model with VD", add_help=False)
+    parser = argparse.ArgumentParser(description="Pretrain a resnet model with IMSVD", add_help=False)
 
     # Data
     parser.add_argument("--data-dir", type=Path, default="./datasets/imagenet",
@@ -107,11 +107,11 @@ def main_worker(gpu, ngpus_per_node, args):
     )
 
     torch.backends.cudnn.benchmark = True
-    model = VD(args).cuda(gpu)
+    model = IMSVD(args).cuda(gpu)
     model = nn.SyncBatchNorm.convert_sync_batchnorm(model)
     model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[gpu])
 
-    model_weight = "./exp/vd/model.pth"
+    model_weight = "./exp/imsvd/model.pth"
     ckpt = torch.load(model_weight, map_location="cuda:0")
 
     msg = model.load_state_dict(ckpt["model"])
@@ -152,7 +152,7 @@ def main_worker(gpu, ngpus_per_node, args):
     plt.show()
 
 
-class VD(nn.Module):
+class IMSVD(nn.Module):
     def __init__(self, args):
         super().__init__()
         self.args = args
@@ -186,7 +186,7 @@ class VD(nn.Module):
 
         N, D = x1.shape
 
-        # VD
+        # IMSVD
         p1 = torch.reshape(x1, [N, -1, self.bin_size])
         p2 = torch.reshape(x2, [N, -1, self.bin_size])
         p1 = torch.clamp(torch.softmax(p1/self.t, dim=2), 1e-8).reshape([N, D])
@@ -253,7 +253,7 @@ class FullGatherLayer(torch.autograd.Function):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser('VD visualization script', parents=[get_arguments()])
+    parser = argparse.ArgumentParser('IMSVD visualization script', parents=[get_arguments()])
     args = parser.parse_args()
     main(args)
 

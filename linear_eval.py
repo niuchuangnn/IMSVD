@@ -30,10 +30,10 @@ def get_arguments():
     )
 
     # Checkpoint
-    parser.add_argument("--pretrained", default='./exp/vd/model_final.pth', type=Path, help="path to pretrained model")
+    parser.add_argument("--pretrained", default='./exp/imsvd/model_final.pth', type=Path, help="path to pretrained model")
     parser.add_argument(
         "--exp-dir",
-        default="./exp/vd_lincls",
+        default="./exp/imsvd_lincls",
         type=Path,
         metavar="DIR",
         help="path to checkpoint directory",

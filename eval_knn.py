@@ -20,7 +20,7 @@ def get_arguments():
     parser.add_argument("--data-dir", default='./datasets/imagenet', type=Path, help="path to dataset")
 
     # Checkpoint
-    parser.add_argument("--pretrained", default='./exp/vd/model_final.pth', type=Path, help="path to pretrained model")
+    parser.add_argument("--pretrained", default='./exp/imsvd/model_final.pth', type=Path, help="path to pretrained model")
 
     # Model
     parser.add_argument("--arch", type=str, default="resnet50")
