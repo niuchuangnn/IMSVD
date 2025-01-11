@@ -37,3 +37,15 @@ python visualize_samples.py  # visualize samples assigned to specific feature un
 
 ### License
 This project is under the CC-BY-NC 4.0 license. See [LICENSE](LICENSE) for details.
+
+```shell
+@misc{imsvd,
+      title={Information-Maximized Soft Variable Discretization for Self-Supervised Image Representation Learning}, 
+      author={Chuang Niu and Wenjun Xia and Hongming Shan and Ge Wang},
+      year={2025},
+      eprint={2501.03469},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV},
+      url={https://arxiv.org/abs/2501.03469}, 
+}
+```
