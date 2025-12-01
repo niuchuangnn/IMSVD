@@ -13,6 +13,8 @@ import augmentations as aug
 import resnet
 import builtins
 import torch.multiprocessing as mp
+import random
+import numpy as np
 
 
 def get_arguments():
@@ -63,6 +65,9 @@ def get_arguments():
     parser.add_argument('--rank', default=0, type=int)
     parser.add_argument('--dist-url', default='tcp://localhost:10001',
                         help='url used to set up distributed training')
+    
+    parser.add_argument("--seed", type=int, default=0,
+                        help="Base random seed")
 
     return parser
 
@@ -87,6 +92,14 @@ def main_worker(gpu, ngpus_per_node, args):
     if "SLURM_NODEID" in os.environ:
         args.rank = int(os.environ["SLURM_NODEID"])
 
+    # setting random seed
+    global_seed = args.seed + args.rank * ngpus_per_node + gpu
+    random.seed(global_seed)
+    np.random.seed(global_seed)
+    torch.manual_seed(global_seed)
+    torch.cuda.manual_seed(global_seed)
+    torch.cuda.manual_seed_all(global_seed)
+    
     # suppress printing if not first GPU on each node
     if args.gpu != 0 or args.rank != 0:
         def print_pass(*args):
