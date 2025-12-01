@@ -21,6 +21,7 @@ import torchvision.models as models
 
 from resnet_cifar import resnet18
 from PIL import Image
+import numpy as np
 
 
 model_names = sorted(name for name in models.__dict__
@@ -71,8 +72,8 @@ parser.add_argument('--dist_url', default='tcp://localhost:10001', type=str,
                     help='url used to set up distributed training')
 parser.add_argument('--dist-backend', default='nccl', type=str,
                     help='distributed backend')
-parser.add_argument('--seed', default=None, type=int,
-                    help='seed for initializing training. ')
+parser.add_argument("--seed", type=int, default=0,
+                        help="Base random seed")
 parser.add_argument('--gpu', default=None, type=int,
                     help='GPU id to use.')
 parser.add_argument('--multiprocessing-distributed', action='store_true',
@@ -97,16 +98,6 @@ best_acc1 = 0
 def main():
     args = parser.parse_args()
     print(vars(args))
-
-    if args.seed is not None:
-        random.seed(args.seed)
-        torch.manual_seed(args.seed)
-        cudnn.deterministic = True
-        warnings.warn('You have chosen to seed training. '
-                      'This will turn on the CUDNN deterministic setting, '
-                      'which can slow down your training considerably! '
-                      'You may see unexpected behavior when restarting '
-                      'from checkpoints.')
 
     if args.gpu is not None:
         warnings.warn('You have chosen a specific GPU. This will completely '
@@ -133,6 +124,18 @@ def main():
 def main_worker(gpu, ngpus_per_node, args):
     global best_acc1
     args.gpu = gpu
+
+    # setting random seed
+    if args.rank >=0 and args.gpu is not None:
+        global_seed = args.seed + args.rank * ngpus_per_node + gpu
+    else:
+        global_seed = args.seed
+
+    random.seed(global_seed)
+    np.random.seed(global_seed)
+    torch.manual_seed(global_seed)
+    torch.cuda.manual_seed(global_seed)
+    torch.cuda.manual_seed_all(global_seed)
 
     # suppress printing if not master
     if args.multiprocessing_distributed and args.gpu != 0:
