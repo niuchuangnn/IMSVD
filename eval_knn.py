@@ -2,8 +2,7 @@ from pathlib import Path
 import argparse
 import os
 import random
-import signal
-import sys
+import numpy as np
 from torchvision import datasets, transforms
 import torch
 import resnet
@@ -42,22 +41,15 @@ def get_arguments():
         "--k", default=20, type=int, metavar="N", help="number of nearest neighbors"
     )
 
+    parser.add_argument("--seed", type=int, default=0,
+                        help="Base random seed")
+
     return parser
 
 
 def main():
     parser = get_arguments()
     args = parser.parse_args()
-    if args.train_percent in {1, 10}:
-        # args.train_files = urllib.request.urlopen(
-        #     f"https://raw.githubusercontent.com/google-research/simclr/master/imagenet_subsets/{args.train_percent}percent.txt"
-        # ).readlines()
-        with open(f"./imagenet_{args.train_percent}percent.txt", 'r') as f:
-            lines = f.readlines()
-
-        args.train_files = []
-        for i in range(len(lines)):
-            args.train_files.append(lines[i][0:-1])
     args.ngpus_per_node = torch.cuda.device_count()
     if "SLURM_JOB_ID" in os.environ:
         signal.signal(signal.SIGUSR1, handle_sigusr1)
@@ -70,6 +62,14 @@ def main():
 
 
 def main_worker(gpu, args):
+    # setting random seed
+    global_seed = args.seed + args.rank
+    random.seed(global_seed)
+    np.random.seed(global_seed)
+    torch.manual_seed(global_seed)
+    torch.cuda.manual_seed(global_seed)
+    torch.cuda.manual_seed_all(global_seed)
+    
     args.rank += gpu
     torch.distributed.init_process_group(
         backend="nccl",
